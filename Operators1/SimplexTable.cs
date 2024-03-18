@@ -58,6 +58,7 @@ namespace Operators
         public void Recount(int strIndex, int colIndex)
         {
             var leadingElement = Table[strIndex][colIndex];
+            List<List<double>> newValues = new();
 
             for (int i = 0; i < Table.Count; i++)
             {
@@ -66,19 +67,26 @@ namespace Operators
                     foreach (var number in Table[strIndex])
                         recounted.Add(number / leadingElement);
                 else
-                    recounted = RecountString(i, strIndex, colIndex, leadingElement);
+                    recounted = RecountString(Table[i], strIndex, colIndex, leadingElement);
 
+                newValues.Add(recounted);
             }
+
+
+            IndexString = RecountString(IndexString, strIndex, colIndex, leadingElement);
+            for (int i = 0; i < Table.Count; i++)
+                Table[i] = newValues[i];
+
         }
 
-        private List<double> RecountString(int index, int str, int col, double leadingElement)
+        private List<double> RecountString(List<double> curStr, int str, int col, double leadingElement)
         {
             var result = new List<double>();
-            for (int i = 0; i < Table[index].Count; i++)
+            for (int i = 0; i < curStr.Count; i++)
             {
-                var newValue = Table[index][i] -
-                    (Table[str][i] *
-                    Table[index][col]) /
+                var newValue = curStr[i] -
+                    Table[str][i] *
+                    curStr[col] /
                     leadingElement;
                 result.Add(newValue);
             }
