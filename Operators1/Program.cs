@@ -13,13 +13,13 @@ namespace Operators
                 new(){ 2, 5, 5, -2, 2, 5 },
                 new(){ 6, 0, 5, 0, 1, 5 },
             };
-            double[] bounds = { 6, 7, 4 , 5};
+            double[] bounds = { 6, 7, 4};
 
-            var optimanPlan = new OptimalPlan(x.ToList());
+            var optimalPlan = new OptimalPlan(x.ToList());
             for (int i = 0; i < limits.Count; i++)
-                optimanPlan.AddLimitation(limits[i], bounds[i]);
+                optimalPlan.AddLimitation(limits[i], bounds[i]);
 
-            optimanPlan.ReduceToCanonical();
+            optimalPlan.ReduceToCanonical();
             optimalPlan.FirstReferencePlan();
 
         }

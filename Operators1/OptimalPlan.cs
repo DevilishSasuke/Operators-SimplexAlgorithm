@@ -35,10 +35,18 @@ namespace Operators
 
         public void FirstReferencePlan()
         {
-            
+            SimplexTable table = new SimplexTable(Limits, Coeffs);
+
+            while (!AreNonNegative(table.IndexString))
+            {
+                var columnIndex = table.MaxAbsValue();
+                var stringIndex = table.MinRelation(columnIndex);
+                table.Recount(stringIndex, columnIndex);
+            }
         }
 
-        private static bool AreNonNegative(double[] array) => array.Any(x => x < 0);
+        private static bool AreNonNegative(double[] array) => array.All(x => x >= 0);
+        private static bool AreNonNegative(List<double> array) => array.All(x => x >= 0);
 
     }
 }
