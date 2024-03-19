@@ -3,91 +3,98 @@ namespace Operators
 {
     public class SimplexTable
     {
-        public List<List<double>> Table { get; private set; } = new();
-        public List<double> IndexString = new();
-        private int columnLeading;
-        private int stringLeading;
-        private int leadingElement;
+        public List<List<decimal>> Table { get; private set; } = new();
+        public List<decimal> IndexRow = new();
+        private int leadingColumn;
+        private int leadingRow;
+        private decimal leadingElement;
 
-        public SimplexTable(List<Limitation> limits, List<double> indexString)
+        public SimplexTable(List<Limitation> limits, List<decimal> indexString)
         {
-
             foreach (var limit in limits) 
             {
-                var current = new List<double>(limit.Coeffs);
+                var current = new List<decimal>(limit.Coeffs);
                 current.Add(limit.Bound);
                 Table.Add(current);
             }
 
             foreach (var value in indexString)
-                IndexString.Add(value * -1);
-            while (IndexString.Count < Table[0].Count)
-                IndexString.Add(0);
+                IndexRow.Add(value * -1);
+            while (IndexRow.Count < Table[0].Count)
+                IndexRow.Add(0);
         }
 
+        // Максимальное по модулю значение
         public int MaxAbsValue()
         {
             int index = 0;
 
-            for (int i = 0; i < IndexString.Count; i++)
-                if (Math.Abs(IndexString[i]) > Math.Abs(IndexString[index]))
+            for (int i = 0; i < IndexRow.Count - 1; i++)
+                if (Math.Abs(IndexRow[i]) > Math.Abs(IndexRow[index]))
                     index = i;
 
             return index;
         }
 
+        // Индекс минимального отношения
         public int MinRelation(int columnIndex)
         {
-            var min = double.MaxValue;
-            int stringIndex = 0;
+            var min = decimal.MaxValue;
+            int rowIndex = 0;
 
             for (int i = 0; i < Table.Count; i++)
             {
+                if (Table[i][columnIndex] <= 0) continue;
                 var value = Table[i].Last() / Table[i][columnIndex];
+                if (value < 0) continue;
 
                 if (value < min)
                 {
                     min = value;
-                    stringIndex = i;
+                    rowIndex = i;
                 }
             }
 
-            return stringIndex;
+            if (min == decimal.MaxValue) throw new Exception("No minimal relation");
+            return rowIndex;
         }
 
-        public void Recount(int strIndex, int colIndex)
+        // Пересчёт таблицы
+        public void Recount(int rowIndex, int colIndex)
         {
-            var leadingElement = Table[strIndex][colIndex];
-            List<List<double>> newValues = new();
+            leadingRow = rowIndex;
+            leadingColumn = colIndex;
+            leadingElement = Table[rowIndex][colIndex];
+            List<List<decimal>> newValues = new();
 
             for (int i = 0; i < Table.Count; i++)
             {
-                List<double> recounted = new();
-                if (i == strIndex)
-                    foreach (var number in Table[strIndex])
+                List<decimal> recounted = new();
+                // Для всех строк кроме решающей
+                if (i == rowIndex)
+                    foreach (var number in Table[rowIndex])
                         recounted.Add(number / leadingElement);
                 else
-                    recounted = RecountString(Table[i], strIndex, colIndex, leadingElement);
+                    recounted = RecountString(Table[i]);
 
                 newValues.Add(recounted);
             }
 
-
-            IndexString = RecountString(IndexString, strIndex, colIndex, leadingElement);
-            for (int i = 0; i < Table.Count; i++)
-                Table[i] = newValues[i];
+            IndexRow = RecountString(IndexRow);
+            Table = newValues;
 
         }
 
-        private List<double> RecountString(List<double> curStr, int str, int col, double leadingElement)
+        // Пересчёт строки правилом прямоугольника
+        private List<decimal> RecountString(List<decimal> currentRow)
         {
-            var result = new List<double>();
-            for (int i = 0; i < curStr.Count; i++)
+            var result = new List<decimal>();
+            for (int i = 0; i < currentRow.Count; i++)
             {
-                var newValue = curStr[i] -
-                    Table[str][i] *
-                    curStr[col] /
-                    leadingElement;
+                var newValue = currentRow[i] - // Старое значение
+                    Table[leadingRow][i] * //A
+                    currentRow[leadingColumn] / // B
+                    leadingElement; // Решающий элемент
                 result.Add(newValue);
             }
 
