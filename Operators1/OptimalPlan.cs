@@ -7,8 +7,13 @@ namespace Operators
         public List<decimal> Coeffs { get; private set; } = new(); // Коэффициенты
         public List<Limitation> Limits { get; private set; } = new(); // Ограничения
         private Dictionary<int, int> Variables = new(); // Словарь смены переменных
+        private bool IsEquality { get; set; }
 
-        public OptimalPlan(List<decimal> coeffs) => this.Coeffs = coeffs;
+        public OptimalPlan(List<decimal> coeffs, bool isEquality = false)
+        {
+            Coeffs = coeffs;
+            IsEquality = isEquality;
+        }
 
         // Приведение к канонической форме
         public void ReduceToCanonical()
@@ -21,10 +26,10 @@ namespace Operators
         // Получуение оптимального плана в симплексной таблице
         public SimplexTable GetOptimailPlan()
         {
-            SimplexTable table = new(Limits, Coeffs);
+            SimplexTable table = new(Limits, Coeffs, IsEquality);
 
             // Пока находятся отрицательные элементы в индекс строке
-            while (!AreNonNegative(table.IndexRow))
+            while (!AreNonNegative(table.IndexString))
             {
                 var columnIndex = table.MaxAbsValue(); // Находим рещающую строку
                 var rowIndex = table.MinRelation(columnIndex); // Находим рещающий элемент
@@ -38,7 +43,7 @@ namespace Operators
         // Вывод списка переменных и итоговой функции
         public void ShowPlan(SimplexTable table)
         {
-            var setOfX = new decimal[table.IndexRow.Count - 1];
+            var setOfX = new decimal[table.IndexString.Count - 1];
 
             foreach(var item in Variables)
                 setOfX[item.Value - 1] = table.Table[item.Key].Last();
@@ -53,7 +58,7 @@ namespace Operators
                 Console.Write(i == Coeffs.Count - 1 ?
                     $" {Coeffs[i]} * {setOfX[i]:f3} " :
                     $" {Coeffs[i]} * {setOfX[i]:f3} +");
-            Console.Write($"= {table.IndexRow.Last():f3}");
+            Console.Write($"= {table.IndexString.Last():f3}");
         }
 
         // Добавление ограничений

@@ -3,25 +3,48 @@ namespace Operators
 {
     public class SimplexTable
     {
-        public List<List<decimal>> Table { get; private set; } = new();
-        public List<decimal> IndexRow = new();
         private int leadingColumn;
         private int leadingRow;
         private decimal leadingElement;
+        public List<List<decimal>> Table { get; private set; } = new();
+        public List<decimal> IndexString { get => Table.Last();
+            set => Table[Table.Count - 1] = value; }
 
-        public SimplexTable(List<Limitation> limits, List<decimal> indexString)
+        public SimplexTable(List<Limitation> limits, List<decimal> indexString, bool isEquality)
         {
-            foreach (var limit in limits) 
+            if (isEquality)
+                EqualityConstructor(limits, indexString);
+            else
+                InequalityConstructor(limits, indexString);
+        }
+
+        public void EqualityConstructor(List<Limitation> limits, List<decimal> indexString)
+        {
+            foreach (var limit in limits)
             {
                 var current = new List<decimal>(limit.Coeffs);
                 current.Add(limit.Bound);
                 Table.Add(current);
             }
 
+            ToIdentityMatrix();
+            ObjectiveFunc(indexString);
+        }
+
+        public void InequalityConstructor(List<Limitation> limits, List<decimal> indexString)
+        {
+            foreach (var limit in limits)
+            {
+                var current = new List<decimal>(limit.Coeffs);
+                current.Add(limit.Bound);
+                Table.Add(current);
+            }
+
+            Table.Add(new());
             foreach (var value in indexString)
-                IndexRow.Add(value * -1);
-            while (IndexRow.Count < Table[0].Count)
-                IndexRow.Add(0);
+                IndexString.Add(value * -1);
+            while (IndexString.Count < Table[0].Count)
+                IndexString.Add(0);
         }
 
         // Максимальное по модулю значение
@@ -29,8 +52,8 @@ namespace Operators
         {
             int index = 0;
 
-            for (int i = 0; i < IndexRow.Count - 1; i++)
-                if (Math.Abs(IndexRow[i]) > Math.Abs(IndexRow[index]))
+            for (int i = 0; i < IndexString.Count - 1; i++)
+                if (Math.Abs(IndexString[i]) > Math.Abs(IndexString[index]))
                     index = i;
 
             return index;
@@ -42,7 +65,7 @@ namespace Operators
             var min = decimal.MaxValue;
             int rowIndex = 0;
 
-            for (int i = 0; i < Table.Count; i++)
+            for (int i = 0; i < Table.Count - 1; i++)
             {
                 if (Table[i][columnIndex] <= 0) continue;
                 var value = Table[i].Last() / Table[i][columnIndex];
@@ -80,9 +103,8 @@ namespace Operators
                 newValues.Add(recounted);
             }
 
-            IndexRow = RecountString(IndexRow);
+            //IndexString = RecountString(IndexString);
             Table = newValues;
-
         }
 
         // Пересчёт строки правилом прямоугольника
@@ -99,6 +121,30 @@ namespace Operators
             }
 
             return result;
+        }
+
+        private void ToIdentityMatrix()
+        {
+            for (int row = 0; row < Table.Count; row++)
+            {
+                var column = row + (Table[0].Count - (Table.Count + 1));
+                Recount(row, column);
+            }
+        }
+
+        private List<decimal> ObjectiveFunc(List<decimal> coeffs)
+        {
+            var size = Table[0].Count - (Table.Count + 1);
+            var func = new decimal[size].ToList();
+
+            for (int i = 0; i < size; i++)
+            {
+                func[i] += coeffs[i];
+                for (int j = 0; j < Table.Count; j++)
+                    func[i] -= Table[j][i] * coeffs[size + j];
+            }
+
+            return func;
         }
     }
 }
