@@ -26,7 +26,7 @@ namespace Operators
                 optimalPlan.AddLimitation(limits[i], bounds[i]);
 
             optimalPlan.ReduceToCanonical();
-            var table = optimalPlan.GetOptimailPlan();
+            var table = optimalPlan.GetOptimalPlan();
             optimalPlan.ShowPlan(table);
         }
 
@@ -45,7 +45,7 @@ namespace Operators
             for (int i = 0; i < limits.Count; i++)
                 optimalPlan.AddLimitation(limits[i], bounds[i]);
 
-            var table = optimalPlan.GetOptimailPlan();
+            var table = optimalPlan.ManageRecources();
             optimalPlan.ShowPlan(table);
         }
     }

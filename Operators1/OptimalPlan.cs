@@ -23,12 +23,32 @@ namespace Operators
                 Limits[i].Expand(size, i);
         }
 
-        // Получуение оптимального плана в симплексной таблице
-        public SimplexTable GetOptimailPlan()
+        // Получуение оптимального плана в симплексной таблице - lab.1
+        public SimplexTable GetOptimalPlan()
         {
             SimplexTable table = new(Limits, Coeffs, IsEquality);
 
             // Пока находятся отрицательные элементы в индекс строке
+            while (!AreNonNegative(table.IndexString))
+            {
+                var columnIndex = table.MaxAbsValue(); // Находим рещающую строку
+                var rowIndex = table.MinRelation(columnIndex); // Находим рещающий элемент
+                table.Recount(rowIndex, columnIndex); // Пересчитываем симплекс таблицу правилом прямоугольника
+                RememberVariables(rowIndex, columnIndex); // Запоминаем номер новой переменной
+            }
+
+            return table;
+        }
+
+        // Распределение ресурсов
+        public SimplexTable ManageRecources()
+        {
+            SimplexTable table = new(Limits, Coeffs, IsEquality);
+
+            var changes = table.GetReferencePlan();
+            foreach (var change in changes)
+                RememberVariables(change.Item1, change.Item2);
+
             while (!AreNonNegative(table.IndexString))
             {
                 var columnIndex = table.MaxAbsValue(); // Находим рещающую строку

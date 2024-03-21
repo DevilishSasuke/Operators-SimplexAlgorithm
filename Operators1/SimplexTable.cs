@@ -28,7 +28,13 @@ namespace Operators
             }
 
             ToIdentityMatrix();
-            ObjectiveFunc(indexString);
+            var objFunc = ObjectiveFunc(indexString);
+            var objValue = objFunc.Last();
+            objFunc[objFunc.Count - 1] = 0;
+            while (objFunc.Count < Table.Last().Count - 1)
+                objFunc.Add(0);
+            objFunc.Add(objValue);
+            Table.Add(objFunc);
         }
 
         public void InequalityConstructor(List<Limitation> limits, List<decimal> indexString)
@@ -83,11 +89,11 @@ namespace Operators
         }
 
         // Пересчёт таблицы
-        public void Recount(int rowIndex, int colIndex)
+        public void Recount(int rowIndex, int columnIndex)
         {
             leadingRow = rowIndex;
-            leadingColumn = colIndex;
-            leadingElement = Table[rowIndex][colIndex];
+            leadingColumn = columnIndex;
+            leadingElement = Table[rowIndex][columnIndex];
             List<List<decimal>> newValues = new();
 
             for (int i = 0; i < Table.Count; i++)
@@ -103,7 +109,6 @@ namespace Operators
                 newValues.Add(recounted);
             }
 
-            //IndexString = RecountString(IndexString);
             Table = newValues;
         }
 
@@ -135,7 +140,7 @@ namespace Operators
         private List<decimal> ObjectiveFunc(List<decimal> coeffs)
         {
             var size = Table[0].Count - (Table.Count + 1);
-            var func = new decimal[size].ToList();
+            var func = new decimal[size + 1].ToList();
 
             for (int i = 0; i < size; i++)
             {
@@ -144,7 +149,43 @@ namespace Operators
                     func[i] -= Table[j][i] * coeffs[size + j];
             }
 
+            for (int i = 0; i < Table.Count; i++)
+                func[size] += Table[i].Last() *coeffs[size + i];
+
             return func;
+        }
+
+        public List<(int, int)> GetReferencePlan()
+        {
+            int rowIndex = 0;
+            List<(int, int)> variables = new();
+            while((rowIndex = AreConstTermsNegative(true)) >= 0)
+            {
+                int columnIndex = FindNegative(Table[rowIndex]);
+                Recount(rowIndex, columnIndex);
+                variables.Add((rowIndex, columnIndex));
+            }
+
+            return variables;
+        }
+
+        private int AreConstTermsNegative(bool hasIndexString = false)
+        {
+            int size = hasIndexString ? Table.Count - 1 : Table.Count;
+
+            for (int i = 0; i < size; i++)
+                if (Table[i].Last() < 0) 
+                    return i;
+
+            return -1;
+        }
+
+        private int FindNegative(List<decimal> row)
+        {
+            for (int i = 0; i < row.Count; i++)
+                if (row[i] < 0) return i;
+
+            throw new Exception("No negative");
         }
     }
 }
