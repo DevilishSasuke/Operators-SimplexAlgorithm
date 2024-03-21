@@ -27,6 +27,7 @@ namespace Operators
         public SimplexTable GetOptimalPlan()
         {
             SimplexTable table = new(Limits, Coeffs, IsEquality);
+            InitVars(Limits.Count, Coeffs.Count + Limits.Count);
 
             // Пока находятся отрицательные элементы в индекс строке
             while (!AreNonNegative(table.IndexString))
@@ -44,6 +45,7 @@ namespace Operators
         public SimplexTable ManageRecources()
         {
             SimplexTable table = new(Limits, Coeffs, IsEquality);
+            InitVars(Limits.Count, Coeffs.Count);
 
             var changes = table.GetReferencePlan();
             foreach (var change in changes)
@@ -86,5 +88,11 @@ namespace Operators
         public void AddLimitation(List<decimal> coeffs, decimal bound) => Limits.Add(new Limitation(coeffs, bound));
         private static bool AreNonNegative(List<decimal> array) => array.All(x => x >= 0);
         private void RememberVariables(int rowIndex, int columnIndex) => Variables[rowIndex] = columnIndex + 1;
+        private void InitVars(int rows, int columns)
+        {
+            int offset = columns - rows;
+            for (int i = 0; i < rows; i++)
+                RememberVariables(i, offset + i);
+        }
     }
 }

@@ -28,13 +28,13 @@ namespace Operators
             }
 
             ToIdentityMatrix();
-            var objFunc = ObjectiveFunc(indexString);
+            /*var objFunc = ObjectiveFunc(indexString);
             var objValue = objFunc.Last();
             objFunc[objFunc.Count - 1] = 0;
             while (objFunc.Count < Table.Last().Count - 1)
                 objFunc.Add(0);
             objFunc.Add(objValue);
-            Table.Add(objFunc);
+            Table.Add(objFunc);*/
         }
 
         public void InequalityConstructor(List<Limitation> limits, List<decimal> indexString)
