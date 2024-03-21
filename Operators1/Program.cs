@@ -6,7 +6,7 @@ namespace Operators
     {
         public static void Main()
         {
-            Lab1();
+            Lab2();
         }
 
 

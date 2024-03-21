@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.Design;
+
 namespace Operators
 {
     public class SimplexTable
@@ -137,8 +139,21 @@ namespace Operators
             }
         }
 
-        private List<decimal> ObjectiveFunc(List<decimal> coeffs)
+        public List<decimal> ObjectiveFunc(List<decimal> coeffs, Dictionary<int, int> variables)
         {
+            var func = new decimal[coeffs.Count + 1].ToList();
+            var varList = variables.Values;
+
+            for (int i = 0; i < func.Count; i++)
+            {
+                if (varList.Contains(i + 1))
+
+                else
+                    func[i] += coeffs[i];
+            }
+
+            return func;
+            /*
             var size = Table[0].Count - (Table.Count + 1);
             var func = new decimal[size + 1].ToList();
 
@@ -152,7 +167,7 @@ namespace Operators
             for (int i = 0; i < Table.Count; i++)
                 func[size] += Table[i].Last() *coeffs[size + i];
 
-            return func;
+            return func;*/
         }
 
         public List<(int, int)> GetReferencePlan()

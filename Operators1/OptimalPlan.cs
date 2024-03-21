@@ -50,6 +50,7 @@ namespace Operators
             var changes = table.GetReferencePlan();
             foreach (var change in changes)
                 RememberVariables(change.Item1, change.Item2);
+            var objFunc = table.ObjectiveFunc(Coeffs, Variables);
 
             while (!AreNonNegative(table.IndexString))
             {
