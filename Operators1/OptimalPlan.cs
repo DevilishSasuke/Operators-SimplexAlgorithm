@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Dynamic;
 
 namespace Operators 
 {
@@ -50,7 +52,7 @@ namespace Operators
             var changes = table.GetReferencePlan();
             foreach (var change in changes)
                 RememberVariables(change.Item1, change.Item2);
-            var objFunc = table.ObjectiveFunc(Coeffs, Variables);
+            //var objFunc = table.ObjectiveFunc(Coeffs, Variables);
 
             while (!AreNonNegative(table.IndexString))
             {
@@ -67,21 +69,26 @@ namespace Operators
         public void ShowPlan(SimplexTable table)
         {
             var setOfX = new decimal[table.IndexString.Count - 1];
+            var size = Math.Min(setOfX.Length, Coeffs.Count);
 
             foreach(var item in Variables)
                 setOfX[item.Value - 1] = table.Table[item.Key].Last();
 
-            for (int i = 0; i < Coeffs.Count; i++)
-                Console.Write(i == Coeffs.Count - 1 ?
+            for (int i = 0; i < size; i++)
+                Console.Write(i == size - 1 ?
                     $"x{i + 1} = {setOfX[i]:f3};" :
                     $"x{i + 1} = {setOfX[i]:f3}, ");
 
             Console.Write("\nF(X) =");
-            for (int i = 0; i < Coeffs.Count; i++)
-                Console.Write(i == Coeffs.Count - 1 ?
+            for (int i = 0; i < size; i++)
+                Console.Write(i == size - 1 ?
                     $" {Coeffs[i]} * {setOfX[i]:f3} " :
                     $" {Coeffs[i]} * {setOfX[i]:f3} +");
-            Console.Write($"= {table.IndexString.Last():f3}");
+            decimal value = 0;
+            for (int i = 0; i < size; i++)
+                value += Coeffs[i] * setOfX[i];
+            Console.Write($"= {value:f3}");
+
         }
 
         // Добавление ограничений

@@ -6,7 +6,11 @@ namespace Operators
     {
         public static void Main()
         {
+            Console.WriteLine("Lab 1:\n");
+            Lab1();
+            Console.WriteLine("\n\nLab 2:\n");
             Lab2();
+            Console.WriteLine("\n\n\n");
         }
 
 

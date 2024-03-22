@@ -30,13 +30,16 @@ namespace Operators
             }
 
             ToIdentityMatrix();
-            /*var objFunc = ObjectiveFunc(indexString);
+            var objFunc = ObjectiveFunc(indexString);
             var objValue = objFunc.Last();
             objFunc[objFunc.Count - 1] = 0;
             while (objFunc.Count < Table.Last().Count - 1)
                 objFunc.Add(0);
-            objFunc.Add(objValue);
-            Table.Add(objFunc);*/
+            //objFunc.Add(objValue);
+            objFunc.Add(0);
+            for (int i = 0; i < objFunc.Count; i++)
+                objFunc[i] = objFunc[i] * -1;
+            Table.Add(objFunc);
         }
 
         public void InequalityConstructor(List<Limitation> limits, List<decimal> indexString)
@@ -139,9 +142,9 @@ namespace Operators
             }
         }
 
-        public List<decimal> ObjectiveFunc(List<decimal> coeffs, Dictionary<int, int> variables)
+        public List<decimal> ObjectiveFunc(List<decimal> coeffs, Dictionary<int, int> variables = null)
         {
-            var func = new decimal[coeffs.Count + 1].ToList();
+            /*var func = new decimal[coeffs.Count + 1].ToList();
             var varList = variables.Values;
 
             for (int i = 0; i < func.Count; i++)
@@ -152,8 +155,8 @@ namespace Operators
                     func[i] += coeffs[i];
             }
 
-            return func;
-            /*
+            return func;*/
+            
             var size = Table[0].Count - (Table.Count + 1);
             var func = new decimal[size + 1].ToList();
 
@@ -167,7 +170,7 @@ namespace Operators
             for (int i = 0; i < Table.Count; i++)
                 func[size] += Table[i].Last() *coeffs[size + i];
 
-            return func;*/
+            return func;
         }
 
         public List<(int, int)> GetReferencePlan()
