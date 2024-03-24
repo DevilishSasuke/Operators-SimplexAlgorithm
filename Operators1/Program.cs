@@ -1,18 +1,13 @@
-﻿using System;
-
-namespace Operators
+﻿namespace Operators
 {
     class Program
     {
         public static void Main()
         {
-            Console.WriteLine("Lab 1:\n");
-            Lab1();
-            Console.WriteLine("\n\nLab 2:\n");
-            Lab2();
-            Console.WriteLine("\n\n\n");
+            Console.WriteLine("Lab 1:\n"); Lab1();
+            Console.WriteLine("\n\nLab 2:\n"); Lab2();
+            Console.WriteLine("");
         }
-
 
         private static void Lab1()
         {
@@ -30,8 +25,8 @@ namespace Operators
                 optimalPlan.AddLimitation(limits[i], bounds[i]);
 
             optimalPlan.ReduceToCanonical();
-            var table = optimalPlan.GetOptimalPlan();
-            optimalPlan.ShowPlan(table);
+            optimalPlan.GetOptimalPlan();
+            optimalPlan.ShowPlan();
         }
 
         private static void Lab2()
@@ -49,8 +44,8 @@ namespace Operators
             for (int i = 0; i < limits.Count; i++)
                 optimalPlan.AddLimitation(limits[i], bounds[i]);
 
-            var table = optimalPlan.ManageRecources();
-            optimalPlan.ShowPlan(table);
+            optimalPlan.ManageRecources();
+            optimalPlan.ShowPlan();
         }
     }
 }

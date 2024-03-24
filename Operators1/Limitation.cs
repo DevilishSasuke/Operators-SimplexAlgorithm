@@ -19,5 +19,12 @@ namespace Operators
             for (int i = 0; i < amount; ++i)
                 Coeffs.Add(i == posOfVariable ? 1 : 0);
         }
+
+        public static implicit operator List<decimal>(Limitation limitation)
+        {
+            var list = new List<decimal>(limitation.Coeffs);
+            list.Add(limitation.Bound); 
+            return list;
+        }
     }
 }
